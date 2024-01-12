@@ -1,26 +1,41 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link
+} from 'react-router-dom';
 
-function App() {
+// Importuj komponenty stron
+import HomePage from './pages/Homepage';
+import News from './pages/News';
+// import NotFoundPage from './pages/NotFoundPage';
+
+const App: React.FC = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div className="container mx-auto">
+        {/* Nawigacja */}
+        <nav className="bg-gray-800 p-4 text-white">
+          <ul className="flex space-x-4">
+            <li>
+              <Link to="/">Home</Link>
+            </li>
+            <li>
+              <Link to="/news">News</Link>
+            </li>
+          </ul>
+        </nav>
+
+        {/* Routing */}
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/news" element={<News />} />
+
+        </Routes>
+      </div>
+    </Router>
   );
-}
+};
 
 export default App;
