@@ -77,11 +77,11 @@ const HomePage: React.FC = () => {
     fetchGameData();
   }, []);
 
-  console.log(process.env.NODE_ENV);
+ 
   
-  // useEffect(() => {
-  //   console.log(games);
-  // }, [games]);
+  useEffect(() => {
+    console.log(games);
+  }, [games]);
 
   return (
     <div className="container mx-auto p-4">
