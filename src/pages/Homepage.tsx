@@ -61,7 +61,7 @@ const HomePage: React.FC = () => {
   
 
   useEffect(() => {
-    const apiUrl = process.env.NODE_ENV === 'production' ? '/getGames' : 'http://localhost:3001/getGames';
+    const apiUrl = process.env.NODE_ENV === 'production' ? '/api/getGames' : 'http://localhost:3001/getGames';
 
     const fetchGameData = async () => {
       try {
@@ -77,7 +77,7 @@ const HomePage: React.FC = () => {
     fetchGameData();
   }, []);
 
-  
+  console.log(process.env.NODE_ENV);
   
   // useEffect(() => {
   //   console.log(games);
@@ -99,7 +99,7 @@ const HomePage: React.FC = () => {
             {games.map(game => (
               <div key={game.id} className="bg-gradient-to-r from-slate-600 via-slate-700 to-slate-500 p-4 shadow-lg shadow-cyan-400/50 hover:shadow-xl hover:shadow-cyan-400/70 focus:shadow-cyan-200/90">
                 <h1 className='text-xl md:text-2xl lg:text-2xl text-slate-100 hover:text-cyan-400 line-clamp-2 text-ellipsis min-h-[2rem]'>{game.name}</h1>
-                <img className='w-full h-auto max-h-96 object-cover py-2' src={`https://images.igdb.com/igdb/image/upload/t_cover_big/${game.cover?.image_id}.png`} alt={`cover-${game.name}`} />
+                <img className='w-full h-auto max-w-128 object-cover py-2' src={`https://images.igdb.com/igdb/image/upload/t_cover_big/${game.cover?.image_id}.png`} alt={`cover-${game.name}`} />
                 <p className='text-sm text-slate-200 font-bold py-1'>First release date:&emssp;{convertUnixToDate(game.first_release_date)}</p>
                 <p className='text-sm text-slate-200 font-bold py-1'>Game created:&emsp;{convertUnixToDate(game.created_at)}</p>
 
