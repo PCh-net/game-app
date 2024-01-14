@@ -1,6 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Russo+One&family=Tektur:wght@400..900&display=swap');
+
 
 body {
   margin: 0;
@@ -15,6 +14,40 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+h1, h2, h3 {
+  font-family: 'Russo One', sans-serif;
+}
+
+p {
+  font-family: 'Tektur', sans-serif;
+}
+
+button {
+  font-family: 'Tektur', sans-serif;
+}
+.ripple-button {
+  background-size: 300% 100%;
+  border-radius: 50px;
+  transition: all .4s ease-in-out;
+  transform-origin: center;
+}
+
+.ripple-button:hover {
+  background-position: 100% 0;
+  transition: all .4s ease-in-out;
+  transform: scale(0.9); /* Skalowanie przy najechaniu */
+}
+
+.ripple-button.gradient-1 {
+  background-image: linear-gradient(to right, #25aae1, #40e495, #30dd8a, #2bb673);
+  box-shadow: 0 4px 15px 0 rgba(49, 196, 190, 0.75);
+}
+.ripple-button.gradient-2 {
+  background-image: linear-gradient(to right, #475569, #334155, #1e293b, #475569);
+  box-shadow: 0 4px 15px 0 rgba(49, 196, 190, 0.75);
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

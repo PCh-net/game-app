@@ -38,7 +38,7 @@ app.get('/getGames', async (req, res) => {
         'Client-ID': process.env.TWITCH_CLIENT_ID,
         'Authorization': `Bearer ${accessToken}`,
       },
-      data: 'fields name,genres.name,release_dates.date,summary; sort release_dates.date desc; limit 5;'
+      data: 'fields age_ratings,aggregated_rating,aggregated_rating_count,alternative_names,artworks,bundles,category,checksum,collection,collections,cover,created_at,dlcs,expanded_games,expansions,external_games,first_release_date,follows,forks,franchise,franchises,game_engines,game_localizations,game_modes,genres,hypes,involved_companies,keywords,language_supports,multiplayer_modes,name,parent_game,platforms,player_perspectives,ports,rating,rating_count,release_dates,remakes,remasters,screenshots,similar_games,slug,standalone_expansions,status,storyline,summary,tags,themes,total_rating,total_rating_count,updated_at,url,version_parent,version_title,videos,websites,cover.url,cover.image_id,cover.alpha_channel,genres.name,platforms.name,release_dates.y,release_dates.date; where first_release_date < 1735685999 & first_release_date > 1672527599; sort total_rating_count asc; limit 24;'
     });
     console.log('IGDB response received');
     res.json(igdbResponse.data);
