@@ -9,13 +9,17 @@ async function getAccessToken() {
 
   try {
     const tokenResponse = await axios.post('https://id.twitch.tv/oauth2/token', params);
-    return tokenResponse.data.access_token;
+    const accessToken = tokenResponse.data.access_token;
+    console.log('Access token obtained:', accessToken);
+    return accessToken;
   } catch (error) {
     console.error('Error fetching access token:', error);
     throw error;
   }
 }
+
 console.log('getGa');
+
 // funkcja serverless
 module.exports = async (req, res) => {
   try {
@@ -23,7 +27,9 @@ module.exports = async (req, res) => {
     if (!accessToken) {
       return res.status(500).send('Error fetching access token');
     }
-console.log('tokken up');
+    console.log('Token successfully obtained');
+    console.log('tokken up');
+
     const igdbResponse = await axios({
       url: 'https://api.igdb.com/v4/games',
       method: 'POST',

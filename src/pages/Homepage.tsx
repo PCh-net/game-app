@@ -66,7 +66,7 @@ const HomePage: React.FC = () => {
     let apiUrl: string;
 
     if (process.env.NODE_ENV === 'production') {
-      apiUrl = '/getGames'; // Środowisko produkcyjne
+      apiUrl = '/api/getGames'; // Środowisko produkcyjne
       console.log('dev');
     } else {
       apiUrl = 'http://localhost:3001/getGames'; // Środowisko lokalne
