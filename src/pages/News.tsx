@@ -21,14 +21,14 @@ const News: React.FC = () => {
   useEffect(() => {
     const fetchGamesAndGenres = async () => {
       try {
-        // Pobieranie gier
+
         const gamesResponse = await axios.post('http://localhost:3001/igdb', {
           endpoint: '/games',
           data: 'fields name,genres.name; sort release_dates.date asc; limit 10;'
         });
         setGames(gamesResponse.data);
 
-        // Pobieranie dodatkowych gatunków
+
         const genresResponse = await axios.post('http://localhost:3001/igdb', {
           endpoint: '/genres',
           data: 'fields name; sort name asc; limit 15;'

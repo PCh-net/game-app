@@ -61,9 +61,11 @@ const HomePage: React.FC = () => {
   
 
   useEffect(() => {
+    const apiUrl = process.env.NODE_ENV === 'production' ? '/getGames' : 'http://localhost:3001/getGames';
+
     const fetchGameData = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/getGames');
+        const response = await axios.get(apiUrl);
         setGames(response.data);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -71,8 +73,11 @@ const HomePage: React.FC = () => {
         setLoading(false);
       }
     };
+
     fetchGameData();
   }, []);
+
+  
   
   // useEffect(() => {
   //   console.log(games);
