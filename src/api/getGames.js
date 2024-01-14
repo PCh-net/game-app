@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-// Funkcja pomocnicza do pobierania access token
+// access token
 async function getAccessToken() {
   const params = new URLSearchParams();
   params.append('client_id', process.env.TWITCH_CLIENT_ID);
@@ -15,15 +15,15 @@ async function getAccessToken() {
     throw error;
   }
 }
-
-// Główna funkcja serverless
+console.log('getGa');
+// funkcja serverless
 module.exports = async (req, res) => {
   try {
     const accessToken = await getAccessToken();
     if (!accessToken) {
       return res.status(500).send('Error fetching access token');
     }
-
+console.log('tokken up');
     const igdbResponse = await axios({
       url: 'https://api.igdb.com/v4/games',
       method: 'POST',
