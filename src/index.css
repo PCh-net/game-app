@@ -19,14 +19,15 @@ h1, h2, h3 {
   font-family: 'Russo One', sans-serif;
 }
 
-p {
+p, a {
   font-family: 'Tektur', sans-serif;
 }
 
 button {
-  font-family: 'Tektur', sans-serif;
+  font-family: 'Russo One', sans-serif;
 }
 .ripple-button {
+  font-family: 'Russo One', sans-serif;
   background-size: 300% 100%;
   border-radius: 50px;
   transition: all .4s ease-in-out;

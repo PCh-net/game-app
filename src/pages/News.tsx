@@ -19,21 +19,21 @@ const News: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchGamesAndGenres = async () => {
+    const fetchGames = async () => {
       try {
-
-        const gamesResponse = await axios.post('http://localhost:3001/igdb', {
-          endpoint: '/games',
-          data: 'fields name,genres.name; sort release_dates.date asc; limit 10;'
-        });
-        setGames(gamesResponse.data);
-
-
-        const genresResponse = await axios.post('http://localhost:3001/igdb', {
-          endpoint: '/genres',
-          data: 'fields name; sort name asc; limit 15;'
-        });
-        setGenres(genresResponse.data);
+        let apiUrl: string;
+          if (process.env.NODE_ENV === 'production') {
+            apiUrl = '/api/getData'; // Środowisko produkcyjne
+          } else {
+            apiUrl = 'http://localhost:3001/getData'; // Środowisko lokalne
+          }
+          const gamesResponse = await axios.post(apiUrl, {
+            endpoint: '/games', // Ścieżka endpointu do IGDB API
+            fields: 'name,rating_count; where first_release_date < 1735685999 & first_release_date > 1672527599', // Pola, które chcesz pobrać
+            sort: 'first_release_date desc', // Sortowanie, np. po nazwie w porządku alfabetycznym
+            limit: 30, // Limit wyników
+          });
+          setGames(gamesResponse.data);
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -41,9 +41,15 @@ const News: React.FC = () => {
       }
     };
 
-    fetchGamesAndGenres();
+    fetchGames();
   }, []);
 
+  console.log('OKKK');
+  useEffect(() => {
+    console.log(games);
+  }, [games]);
+
+  
   return (
     <div className="container mx-auto p-4">
       <div className='bg-gradient-to-tr from-slate-600 via-slate-700 to-slate-800'>
@@ -58,16 +64,13 @@ const News: React.FC = () => {
             <ul>
               {games.map(game => (
                 <li className='text-slate-300' key={game.id}>
-                  {game.name} - Gatunki: {game.genres?.map(genre => genre.name).join(', ')}
+                  {/* {game.name} - Gatunki: {game.genres?.map(genre => genre.name).join(', ')} */}
+                  Gatunki:{game.name}
                 </li>
               ))}
             </ul>
             <h2>Gatunki Gier</h2>
-            <ul>
-              {genres.map(genre => (
-                <li className='text-slate-300' key={genre.id}>{genre.name}</li>
-              ))}
-            </ul>
+
           </div>
         )}
       </div>

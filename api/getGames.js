@@ -1,3 +1,5 @@
+// TEMP LOCAL
+// ----------
 const axios = require('axios');
 
 // access token
@@ -18,7 +20,6 @@ async function getAccessToken() {
   }
 }
 
-console.log('getGa');
 
 // funkcja serverless
 module.exports = async (req, res) => {

@@ -1,3 +1,4 @@
+// server.js
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -49,22 +50,63 @@ app.get('/getGames', async (req, res) => {
 });
 
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
 
 
-app.post('/igdb', async (req, res) => {
+app.get('/getDataaa', async (req, res) => {
   let endpoint; // Deklaracja poza blokiem try
+console.log({endpoint});
   try {
-    endpoint = req.body.endpoint; // Przypisanie wartości
-    const queryData = req.body.data; // dane do zapytania
+    //endpoint = req.body.endpoint; // Przypisanie wartości
+    //const queryData = req.body.data; // dane do zapytania
     const accessToken = await getAccessToken();
     if (!accessToken) {
       return res.status(500).send('Error fetching access token');
     }
 
+    // Pobieranie parametrów z zapytania front-endu
+    const { endpoint, fields, sort, limit } = req.body;
+console.log('OOOOK');
+console.log(`params-${endpoint}-${fields}-${sort}-${limit}`);
+console.log(`endpoint-${endpoint}`);
+
+    const igdbResponse = await axios({
+      url: `https://api.igdb.com/v4${endpoint}`,
+      method: 'GET',
+      headers: {
+        'Client-ID': process.env.TWITCH_CLIENT_ID,
+        'Authorization': `Bearer ${accessToken}`,
+      },
+      data: `fields ${fields}; sort ${sort}; limit ${limit};`,
+    });
+
+    res.status(200).json(igdbResponse.data);
+  } catch (error) {
+    console.log('error');
+  }
+});
+
+
+
+
+
+
+app.post('/getData', async (req, res) => {
+  try {
+    const accessToken = await getAccessToken();
+    if (!accessToken) {
+      return res.status(500).send('Error fetching access token');
+    }
+    if (!accessToken) {
+      console.log('token OFF');
+    } else{
+      console.log('YOO');
+    }
+
+
+    const { endpoint, fields, sort, limit } = req.body;
+    //console.log('OOOOK');
+    console.log(`---params-endpoint-${endpoint}-${fields}-${sort}-${limit}`);
+    //console.log(`fields ${fields}; sort ${sort}; limit ${limit};`);
     const igdbResponse = await axios({
       url: `https://api.igdb.com/v4${endpoint}`,
       method: 'POST',
@@ -72,12 +114,30 @@ app.post('/igdb', async (req, res) => {
         'Client-ID': process.env.TWITCH_CLIENT_ID,
         'Authorization': `Bearer ${accessToken}`,
       },
-      data: queryData
+      data: `fields ${fields}; sort ${sort}; limit ${limit};`,
     });
 
-    res.json(igdbResponse.data);
+    // console.log('IGDB Response:', igdbResponse.data);
+    // console.log('IGDB Response Status:', igdbResponse.status);
+    // console.log('IGDB Response Headers:', igdbResponse.headers);
+
+
+    res.status(200).json(igdbResponse.data);
   } catch (error) {
-    console.error(`Error fetching data from IGDB endpoint ${endpoint}:`, error);
+    // LONG console.error('Error fetching data from IGDB:', error);
     res.status(500).send('Server error');
+    // console.log('error');
   }
 });
+
+
+
+
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
+
+
