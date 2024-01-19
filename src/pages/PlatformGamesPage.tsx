@@ -98,9 +98,9 @@ const PlatformGamesPage: React.FC = () => {
   }, [platformSlug, navigate, page, pageSize]);
 
 
-  useEffect(() => {
-    console.log(games);
-  }, [games]);
+  // useEffect(() => {
+  //   console.log(games);
+  // }, [games]);
 
 
   return (

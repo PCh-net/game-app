@@ -93,9 +93,9 @@ const HomePage: React.FC = () => {
 
  
   
-  useEffect(() => {
-    console.log(games);
-  }, [games]);
+  // useEffect(() => {
+  //   console.log(games);
+  // }, [games]);
 
   return (
     <div className="container mx-auto p-4">

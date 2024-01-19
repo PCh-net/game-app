@@ -151,9 +151,7 @@ const GameDetail: React.FC = () => {
     fetchGameDetails();
   }, [gameId]);
 
-  useEffect(() => {
-    console.log(game);
-  }, [game]);
+
 
   const convertUnixToDate = (unixTimestamp: number) => {
     const date = new Date(unixTimestamp * 1000);

@@ -74,9 +74,9 @@ const News: React.FC = () => {
     fetchGames();
   }, []);
 
-  useEffect(() => {
-    console.log(games);
-  }, [games]);
+  // useEffect(() => {
+  //   console.log(games);
+  // }, [games]);
 
   
   return (

@@ -80,8 +80,8 @@ const GenreGamesPage: React.FC = () => {
           } else {
             apiUrl = 'http://localhost:3001/getData';
           }
-    console.log({genreSlug});
-    console.log('ok');
+    // console.log({genreSlug});
+    // console.log('ok');
 
           const gamesResponse = await axios.post(apiUrl, {
             endpoint: '/games',
@@ -104,9 +104,9 @@ const GenreGamesPage: React.FC = () => {
   }, [genreSlug, navigate, page, pageSize]);
 
 
-  useEffect(() => {
-    console.log(games);
-  }, [games]);
+  // useEffect(() => {
+  //   console.log(games);
+  // }, [games]);
 
 
   return (

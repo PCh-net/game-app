@@ -83,12 +83,12 @@ const PS5GamesPage: React.FC = () => {
     };
   
     fetchPS5Games();
-  }, [page, pageSize]); // Dodaj 'page' i 'pageSize' do zależności
+  }, [page, pageSize]);
   
 
-  useEffect(() => {
-    console.log(games);
-  }, [games]);
+  // useEffect(() => {
+  //   console.log(games);
+  // }, [games]);
 
 
   return (

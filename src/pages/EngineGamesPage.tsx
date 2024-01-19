@@ -79,8 +79,8 @@ const EngineGamesPage: React.FC = () => {
           } else {
             apiUrl = 'http://localhost:3001/getData';
           }
-    console.log({gameEngineSlug});
-    console.log('ok');
+    // console.log({gameEngineSlug});
+    // console.log('ok');
 
           const gamesResponse = await axios.post(apiUrl, {
             endpoint: '/games',
@@ -103,9 +103,9 @@ const EngineGamesPage: React.FC = () => {
   }, [gameEngineSlug, navigate, page, pageSize]);
 
 
-  useEffect(() => {
-    console.log(games);
-  }, [games]);
+  // useEffect(() => {
+  //   console.log(games);
+  // }, [games]);
 
 
   return (
