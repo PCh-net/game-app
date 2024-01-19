@@ -8,6 +8,8 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+
 }
 
 code {
@@ -19,7 +21,7 @@ h1, h2, h3 {
   font-family: 'Russo One', sans-serif;
 }
 
-p, a {
+p, a, span {
   font-family: 'Tektur', sans-serif;
 }
 
@@ -41,7 +43,7 @@ button {
 }
 
 .ripple-button.gradient-1 {
-  background-image: linear-gradient(to right, #25aae1, #40e495, #30dd8a, #2bb673);
+  background-image: linear-gradient(to right, #2dd4bf, #0f766e, #042f2e, #14b8a6);
   box-shadow: 0 4px 15px 0 rgba(49, 196, 190, 0.75);
 }
 .ripple-button.gradient-2 {

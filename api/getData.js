@@ -27,7 +27,7 @@ module.exports = async (req, res) => {
     }
 
     // Pobieranie parametrów z zapytania front-endu
-    const { endpoint, fields, sort, limit } = req.body;
+    const { endpoint, fields, where, sort, limit, offset } = req.body;
 
     const igdbResponse = await axios({
       url: `https://api.igdb.com/v4${endpoint}`,
@@ -36,7 +36,7 @@ module.exports = async (req, res) => {
         'Client-ID': process.env.TWITCH_CLIENT_ID,
         'Authorization': `Bearer ${accessToken}`,
       },
-      data: `fields ${fields}; sort ${sort}; limit ${limit};`,
+      data: `fields ${fields}; where ${where}; sort ${sort}; limit ${limit};${offset && ` offset ${offset};`}`,
     });
 
     res.status(200).json(igdbResponse.data);
