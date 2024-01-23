@@ -5,16 +5,16 @@ import { motion } from 'framer-motion';
 import LinkFontSize from '../components/LinkFontSize';
 import SeoMetaTags from '../components/SeoMetaTags';
 
-const PlatformPage = () => {
+const PerspectivePage = () => {
 
 
   return (
     
   <div className="container mx-auto p-4">
   <SeoMetaTags 
-    title={`Games for platform | PCh`}
-    description="Discover Games for All Platforms: PC, Consoles, and Mobile Devices. Immerse Yourself in Diverse Worlds Without Platform Boundaries."
-    imageUrl="/images/poster-platforms.jpg" 
+    title={`Games perspectives | PCh`}
+    description="Discover Games from Various Perspectives: Feel the Adrenaline in First-Person, Strategy and Tactics in Top-Down View, and Full Immersion in 3D Worlds."
+    imageUrl="/images/poster-perspectives.jpg" 
   />
     <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-4">
     {/* --- */}
@@ -38,144 +38,7 @@ const PlatformPage = () => {
     </div>
 
     {/* --- */}
-    <div className="flex flex-col bg-gradient-to-r from-slate-600 via-slate-700 to-slate-500 p-4 shadow-lg shadow-cyan-400/50 hover:shadow-xl hover:shadow-cyan-400/70 focus:shadow-cyan-200/90">
-      <Link to="/platform/android" onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }}>
-        <motion.div
-          whileHover={{ scale: 1.05, boxShadow: '0px 10px 20px rgba(55, 175, 230, 0.7)' }}
-        >
-          <img
-            className='w-full h-auto max-w-128 object-cover'
-            src="/images/platform/android-13.png"
-            alt="android-13"
-          />
-        </motion.div>
-      </Link>
-      <Link className='pt-4' onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }} to="/platform/android">
-        <MiniButton gradientClass="gradient-1" size="text-sm" fullWidth={true}>
-          Games
-        </MiniButton>
-      </Link>
-    </div>
 
-    {/* --- */}
-    <div className="flex flex-col bg-gradient-to-r from-slate-600 via-slate-700 to-slate-500 p-4 shadow-lg shadow-cyan-400/50 hover:shadow-xl hover:shadow-cyan-400/70 focus:shadow-cyan-200/90">
-      <Link to="/platform/win" onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }}>
-        <motion.div
-          whileHover={{ scale: 1.05, boxShadow: '0px 10px 20px rgba(55, 175, 230, 0.7)' }}
-        >
-          <img
-            className='w-full h-auto max-w-128 object-cover'
-            src="/images/platform/windows-11.png"
-            alt="windows-11"
-          />
-        </motion.div>
-      </Link>
-      <Link className='pt-4' onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }} to="/platform/win">
-        <MiniButton gradientClass="gradient-1" size="text-sm" fullWidth={true}>
-          Games
-        </MiniButton>
-      </Link>
-    </div>
-
-    {/* --- */}
-    <div className="flex flex-col bg-gradient-to-r from-slate-600 via-slate-700 to-slate-500 p-4 shadow-lg shadow-cyan-400/50 hover:shadow-xl hover:shadow-cyan-400/70 focus:shadow-cyan-200/90">
-      <Link to="/platform/switch" onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }}>
-        <motion.div
-          whileHover={{ scale: 1.05, boxShadow: '0px 10px 20px rgba(55, 175, 230, 0.7)' }}
-        >
-          <img
-            className='w-full h-auto max-w-128 object-cover'
-            src="/images/platform/nintendo-switch.png"
-            alt="nintendo-switch"
-          />
-        </motion.div>
-      </Link>
-      <Link className='pt-4' onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }} to="/platform/switch">
-        <MiniButton gradientClass="gradient-1" size="text-sm" fullWidth={true}>
-          Games
-        </MiniButton>
-      </Link>
-    </div>
-
-    {/* --- */}
-    <div className="flex flex-col bg-gradient-to-r from-slate-600 via-slate-700 to-slate-500 p-4 shadow-lg shadow-cyan-400/50 hover:shadow-xl hover:shadow-cyan-400/70 focus:shadow-cyan-200/90">
-      <Link to="/platform/oculus-go" onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }}>
-        <motion.div
-          whileHover={{ scale: 1.05, boxShadow: '0px 10px 20px rgba(55, 175, 230, 0.7)' }}
-        >
-          <img
-            className='w-full h-auto max-w-128 object-cover'
-            src="/images/platform/oculus-go.png"
-            alt="oculus-go"
-          />
-        </motion.div>
-      </Link>
-      <Link className='pt-4' onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }} to="/platform/oculus-go">
-        <MiniButton gradientClass="gradient-1" size="text-sm" fullWidth={true}>
-          Games
-        </MiniButton>
-      </Link>
-    </div>
-
-    {/* --- */}
-    <div className="flex flex-col bg-gradient-to-r from-slate-600 via-slate-700 to-slate-500 p-4 shadow-lg shadow-cyan-400/50 hover:shadow-xl hover:shadow-cyan-400/70 focus:shadow-cyan-200/90">
-      <Link to="/platform/mac" onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }}>
-        <motion.div
-          whileHover={{ scale: 1.05, boxShadow: '0px 10px 20px rgba(55, 175, 230, 0.7)' }}
-        >
-          <img
-            className='w-full h-auto max-w-128 object-cover'
-            src="/images/platform/mac.png"
-            alt="mac"
-          />
-        </motion.div>
-      </Link>
-      <Link className='pt-4' onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }} to="/platform/mac">
-        <MiniButton gradientClass="gradient-1" size="text-sm" fullWidth={true}>
-          Games
-        </MiniButton>
-      </Link>
-    </div>
-
-    {/* --- */}
-    <div className="flex flex-col bg-gradient-to-r from-slate-600 via-slate-700 to-slate-500 p-4 shadow-lg shadow-cyan-400/50 hover:shadow-xl hover:shadow-cyan-400/70 focus:shadow-cyan-200/90">
-      <Link to="/platform/ios" onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }}>
-        <motion.div
-          whileHover={{ scale: 1.05, boxShadow: '0px 10px 20px rgba(55, 175, 230, 0.7)' }}
-        >
-          <img
-            className='w-full h-auto max-w-128 object-cover'
-            src="/images/platform/ios.png"
-            alt="ios"
-          />
-        </motion.div>
-      </Link>
-      <Link className='pt-4' onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }} to="/platform/ios">
-        <MiniButton gradientClass="gradient-1" size="text-sm" fullWidth={true}>
-          Games
-        </MiniButton>
-      </Link>
-    </div>
-
-    {/* --- */}
-    <div className="flex flex-col bg-gradient-to-r from-slate-600 via-slate-700 to-slate-500 p-4 shadow-lg shadow-cyan-400/50 hover:shadow-xl hover:shadow-cyan-400/70 focus:shadow-cyan-200/90">
-      <Link to="/platform/linux" onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }}>
-        <motion.div
-          whileHover={{ scale: 1.05, boxShadow: '0px 10px 20px rgba(55, 175, 230, 0.7)' }}
-        >
-          <img
-            className='w-full h-auto max-w-128 object-cover'
-            src="/images/platform/linux.png"
-            alt="linux"
-          />
-        </motion.div>
-      </Link>
-      <Link className='pt-4' onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }} to="/platform/linux">
-        <MiniButton gradientClass="gradient-1" size="text-sm" fullWidth={true}>
-          Games
-        </MiniButton>
-      </Link>
-    </div>
 
   </div>
   {/* ---------- */}
@@ -320,4 +183,4 @@ const PlatformPage = () => {
   );
 };
 
-export default PlatformPage;
+export default PerspectivePage;

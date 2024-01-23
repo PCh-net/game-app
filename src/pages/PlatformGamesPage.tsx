@@ -6,6 +6,8 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import MiniButton from '../components/MiniButton';
 import MidButton from '../components/MidButton';
 import LinkFontSize from '../components/LinkFontSize';
+import ProgressBar from '../components/ProgressBar';
+import SeoMetaTags from '../components/SeoMetaTags';
 
 // Interfejsy Game, Genre, Cover, Platforms, GameEngines pozostają bez zmian
 interface Game {
@@ -17,6 +19,11 @@ interface Game {
   storyline: string;
   summary: string;
   game_engines: GameEngines[];
+  release_dates: ReleaseDates[];
+  total_rating_count: number;
+  total_rating: number;
+  rating: number;
+  player_perspectives: PlayerPerspective[];
 }
 
 interface Genre {
@@ -45,6 +52,20 @@ interface GameEngines {
   slug: string;
   url: string;
 }
+interface ReleaseDates {
+  id: number;
+  date: number;
+  human: string;
+  m: number;
+  y: number;
+}
+interface PlayerPerspective {
+  id: number;
+  name: string;
+  slug: string;
+  url: string;
+}
+
 
 const PlatformGamesPage: React.FC = () => {
   const [games, setGames] = useState<Game[]>([]);
@@ -67,8 +88,7 @@ const PlatformGamesPage: React.FC = () => {
       const fetchGames = async () => {
         setLoading(true);
         setIsLoading(true);
-        console.log("Aktualna strona:", page);
-        console.log("Ilość elementów na stronie:", pageSize);
+
         try {
           let apiUrl: string;
           if (process.env.NODE_ENV === 'production') {
@@ -79,9 +99,9 @@ const PlatformGamesPage: React.FC = () => {
     
           const gamesResponse = await axios.post(apiUrl, {
             endpoint: '/games',
-            fields: 'name,rating_count,storyline,summary,platforms.slug,platforms.name,cover.url,cover.image_id,genres.name,genres.slug,game_engines.name,game_engines.slug',
-            where: `platforms.slug = "${platformSlug}"`,
-            sort: 'total_rating_count desc',
+            fields: 'name,rating_count,storyline,summary,total_rating_count,total_rating,rating,platforms.slug,platforms.name,cover.url,cover.image_id,genres.name,genres.slug,game_engines.name,game_engines.slug,release_dates.created_at,release_dates.date,release_dates.human,release_dates.m,release_dates.y,player_perspectives.name,player_perspectives.slug,player_perspectives.url',
+            where: `platforms.slug = "${platformSlug}" & release_dates.date >= 1672527599`,
+            sort: 'rating desc',
             limit: pageSize,
             offset: (page - 1) * pageSize,
           });
@@ -106,19 +126,24 @@ const PlatformGamesPage: React.FC = () => {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl md:text-4xl lg:text-4xl text-slate-200 py-3">
-      Games for {safePlatformSlug.toUpperCase().replace('-', ' ')}
+      Games for platform {safePlatformSlug.toUpperCase().replace(/-/g, ' ')}
       </h1>
       {/* ... */}
       <div className="">
         {loading ? (
           <div className="loader-container">
-            <h1 className="text-2xl text-slate-200">Loading...</h1>
+            <h1 className="text-2xl md:text-2xl lg:text-2xl text-slate-200">Loading page {page}</h1>
             <img className="w-40" src="/images/loader.gif" alt="loader"></img>
           </div>
         ) : (
           <>
             {isLoading && <img className="w-20" src="/images/loader.gif" alt="Loading..." />}
             <div className="flex items-center justify-center space-x-4 pb-4">
+            <SeoMetaTags 
+              title={`Games for platform | PCh`}
+              description="Discover Games for All Platforms: PC, Consoles, and Mobile Devices. Immerse Yourself in Diverse Worlds Without Platform Boundaries."
+              imageUrl="/images/poster-platforms.jpg" 
+            />
               <div className='text-right'>
                 <MidButton
                   onClick={() => setPage((prevPage) => Math.max(prevPage - 1, 1))}
@@ -160,7 +185,7 @@ const PlatformGamesPage: React.FC = () => {
                   className="flex bg-gradient-to-r from-slate-600 via-slate-700 to-slate-500 p-4 shadow-lg shadow-cyan-400/50 hover:shadow-xl hover:shadow-cyan-400/70 focus:shadow-cyan-200/90"
                 >
                   <div className="flex-row basis-2/6">
-                  <Link to={`/game/${game.id}`}>
+                  <Link to={`/game/${game.id}`} onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }}>
                     <img
                       className="h-full max-h-96 object-cover shadow-lg shadow-cyan-400/50 hover:shadow-xl hover:shadow-cyan-400/70 focus:shadow-cyan-200/90"
                       src={`https://images.igdb.com/igdb/image/upload/t_cover_big/${game.cover?.image_id}.png`}
@@ -224,11 +249,35 @@ const PlatformGamesPage: React.FC = () => {
                       : null }              
                     </p>
 
+                    {/* --- */}
+                    <p className='text-xs md:text-sm lg:text-sm text-slate-100'>
+                      <span className='text-xs md:text-sm lg:text-sm text-cyan-400 font-bold'>Player perspective: </span>
+                      {game.player_perspectives && game.player_perspectives.length > 0
+                      ? game.player_perspectives.map((player_perspective, index) => (
+                          <span key={player_perspective.id}>
+                            <LinkFontSize to={`/perspective/${player_perspective.slug}`} fontSize="text-xs md:text-sm lg:text-sm" fontType="Tektur">
+                              {player_perspective.name}
+                            </LinkFontSize>
+                            {index < game.player_perspectives.length - 1 ? ', ' : ''}
+                          </span>
+                        ))
+                      : null }              
+                    </p>
 
+
+                    <p className='text-xs md:text-sm lg:text-sm text-slate-100'>{game.release_dates[0].y}.{game.release_dates[0].m}</p>
+
+
+
+                    {game.rating ? (
+                      <ProgressBar currentProgress={game.rating} maxProgress={100} />
+                    ) : (
+                      null
+                    )}
 
 
                     <div className="mt-2">
-                      <Link onClick={() => window.scrollTo(0, 0)} to={`/game/${game.id}`}>
+                      <Link onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }} to={`/game/${game.id}`}>
                         <MiniButton gradientClass="gradient-1" size="text-sm" fullWidth={true}>
                           More
                         </MiniButton>

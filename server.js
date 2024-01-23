@@ -39,7 +39,7 @@ app.get('/getGames', async (req, res) => {
         'Client-ID': process.env.TWITCH_CLIENT_ID,
         'Authorization': `Bearer ${accessToken}`,
       },
-      data: 'fields age_ratings,aggregated_rating,aggregated_rating_count,alternative_names,artworks,bundles,category,checksum,collection,collections,cover,created_at,dlcs,expanded_games,expansions,external_games,first_release_date,follows,forks,franchise,franchises,game_engines,game_engines.name,game_engines.slug,game_localizations,game_modes,genres,hypes,involved_companies,keywords,language_supports,multiplayer_modes,name,parent_game,platforms,player_perspectives,ports,rating,rating_count,release_dates,remakes,remasters,screenshots,similar_games,slug,standalone_expansions,status,storyline,summary,tags,themes,total_rating,total_rating_count,updated_at,url,version_parent,version_title,videos,websites,cover.url,cover.image_id,cover.alpha_channel,genres.name,genres.slug,platforms.name,platforms.slug,release_dates.y,release_dates.date; where first_release_date < 1735685999 & first_release_date > 1672527599; sort total_rating_count asc; limit 24;'
+      data: 'fields age_ratings,aggregated_rating,aggregated_rating_count,alternative_names,artworks,bundles,category,checksum,collection,collections,cover,created_at,dlcs,expanded_games,expansions,external_games,first_release_date,follows,forks,franchise,franchises,game_engines,game_engines.name,game_engines.slug,game_localizations,game_modes,genres,hypes,involved_companies,keywords,language_supports,multiplayer_modes,name,parent_game,platforms,player_perspectives,ports,rating,rating_count,release_dates,remakes,remasters,screenshots,similar_games,slug,standalone_expansions,status,storyline,summary,tags,themes,total_rating,total_rating_count,updated_at,url,version_parent,version_title,videos,websites,cover.url,cover.image_id,cover.alpha_channel,genres.name,genres.slug,platforms.name,platforms.slug,release_dates.y,release_dates.date,release_dates.m,release_dates.human,player_perspectives.name,player_perspectives.slug,player_perspectives.url; where first_release_date < 1735685999 & first_release_date > 1672527599; sort rating desc; limit 22;'
     });
     console.log('IGDB response received');
     res.json(igdbResponse.data);
@@ -53,21 +53,16 @@ app.get('/getGames', async (req, res) => {
 
 
 app.get('/getDataaa', async (req, res) => {
-  let endpoint; // Deklaracja poza blokiem try
+  let endpoint;
 console.log({endpoint});
   try {
-    //endpoint = req.body.endpoint; // Przypisanie wartości
-    //const queryData = req.body.data; // dane do zapytania
+
     const accessToken = await getAccessToken();
     if (!accessToken) {
       return res.status(500).send('Error fetching access token');
     }
 
-    // Pobieranie parametrów z zapytania front-endu
     const { endpoint, fields, sort, limit } = req.body;
-// console.log('OOOOK');
-// console.log(`params-${endpoint}-${fields}-${sort}-${limit}`);
-// console.log(`endpoint-${endpoint}`);
 
     const igdbResponse = await axios({
       url: `https://api.igdb.com/v4${endpoint}`,
@@ -98,13 +93,9 @@ app.post('/getData', async (req, res) => {
       return res.status(500).send('Error fetching access token');
     }
 
-    // console.log('FIELDS IRST');
-    //console.log(`fields ${fields}; where ${where}; sort ${sort}; limit ${limit};${offset && ` offset ${offset};`}`);
 
     const { endpoint, fields, where, sort, limit, offset } = req.body;
-    // console.log('OOOOK');
 
-//console.log('FIELDS SEC');
     //console.log(`fields ${fields}; where ${where}; sort ${sort}; limit ${limit};${offset && ` offset ${offset};`}`);
 
     const igdbResponse = await axios({
@@ -114,7 +105,7 @@ app.post('/getData', async (req, res) => {
         'Client-ID': process.env.TWITCH_CLIENT_ID,
         'Authorization': `Bearer ${accessToken}`,
       },
-      data: `fields ${fields}; where ${where}; sort ${sort}; limit ${limit};${offset && ` offset ${offset};`}`,
+      data: `fields ${fields}; where ${where}; sort ${sort}; limit ${limit}; ${offset && ` offset ${offset};`}`,
     });
 
     // console.log('IGDB Response:', igdbResponse.data);

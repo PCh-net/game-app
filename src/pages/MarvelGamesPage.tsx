@@ -1,7 +1,8 @@
-// src/pages/EngineGamesPage.tsx
+// src/pages/GenreGamesPage.tsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 import MiniButton from '../components/MiniButton';
 import MidButton from '../components/MidButton';
@@ -17,7 +18,6 @@ interface Game {
   storyline: string;
   summary: string;
   game_engines: GameEngines[];
-  player_perspectives: PlayerPerspective[];
 }
 
 interface Genre {
@@ -46,64 +46,52 @@ interface GameEngines {
   slug: string;
   url: string;
 }
-interface PlayerPerspective {
-  id: number;
-  name: string;
-  slug: string;
-  url: string;
-}
 
-const EngineGamesPage: React.FC = () => {
+const MarvelGamesPage: React.FC = () => {
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const { gameEngineSlug } = useParams<{ gameEngineSlug: string }>();
+
   const navigate = useNavigate();
 
   const [page, setPage] = useState(1);
   const [pageSize] = useState(12);
-  const safePlatformSlug = gameEngineSlug ?? 'unknown-genre';
+
 
   useEffect(() => {
+    // ... logic
+    const fetchGames = async () => {
+      setLoading(true);
+      setIsLoading(true);
 
-    if (!gameEngineSlug) {
-      // ... 404
-      navigate('/404');
-
-
-    } else {
-      // ... logic
-      const fetchGames = async () => {
-        setLoading(true);
-        setIsLoading(true);
-
-        try {
-          let apiUrl: string;
-          if (process.env.NODE_ENV === 'production') {
-            apiUrl = '/api/getData'; 
-          } else {
-            apiUrl = 'http://localhost:3001/getData';
-          }
-
-          const gamesResponse = await axios.post(apiUrl, {
-            endpoint: '/games',
-            fields: 'name,rating_count,storyline,summary,platforms.slug,platforms.name,cover.url,cover.image_id,genres.name,genres.slug,game_engines.name,game_engines.slug',
-            where: `game_engines.slug = "${gameEngineSlug}" & release_dates.date >= 1517439599`,
-            sort: 'name desc',
-            limit: pageSize,
-            offset: (page - 1) * pageSize,
-          });
-          setIsLoading(false);
-          setGames(gamesResponse.data);
-        } catch (error) {
-          console.error('Error fetching data:', error);
-        } finally {
-          setLoading(false);
+      try {
+        let apiUrl: string;
+        if (process.env.NODE_ENV === 'production') {
+          apiUrl = '/api/getData'; 
+        } else {
+          apiUrl = 'http://localhost:3001/getData';
         }
-      };
-      fetchGames();
-    }
-  }, [gameEngineSlug, navigate, page, pageSize]);
+
+
+        const gamesResponse = await axios.post(apiUrl, {
+          endpoint: '/games',
+          fields: 'name,rating_count,storyline,summary,platforms.slug,platforms.name,cover.url,cover.image_id,genres.name,genres.slug,game_engines.name,game_engines.slug',
+          where: `id = (259466,109421,109419,109422,165868,26950,169197,135971,200836,153019,272315,109234,272508,251543,279646,144774,248352,203804,242353,138181,154632,116585,143538,168667)`,
+          sort: 'total_rating_count desc',
+          limit: pageSize,
+          offset: (page - 1) * pageSize,
+        });
+        setIsLoading(false);
+        setGames(gamesResponse.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchGames();
+    
+  }, [navigate, page, pageSize]);
 
 
   // useEffect(() => {
@@ -114,24 +102,24 @@ const EngineGamesPage: React.FC = () => {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl md:text-4xl lg:text-4xl text-slate-200 py-3">
-      Games engine {safePlatformSlug.toUpperCase().replace(/-/g, ' ')}
+      Marvel games
       </h1>
       {/* ... */}
       <div className="">
         {loading ? (
           <div className="loader-container">
-            <h1 className="text-2xl text-slate-200">Loading...</h1>
+            <h1 className="text-2xl text-slate-200">Loading page {page}</h1>
             <img className="w-40" src="/images/loader.gif" alt="loader"></img>
           </div>
         ) : (
           <>
             {isLoading && <img className="w-20" src="/images/loader.gif" alt="Loading..." />}
             <div className="flex items-center justify-center space-x-4 pb-4">
-              <SeoMetaTags 
-                title={`Engine games | ${safePlatformSlug.replace(/-/g, ' ')} | PCh`}
-                description="Discover the Capabilities of Modern Game Engines: Innovations, Performance, and Developer Support."
-                imageUrl="/images/poster-engines.jpg" 
-              />
+            <SeoMetaTags 
+              title={`Marvel games | PCh`}
+              description="Experience Amazing Superhero Adventures: Discover Games Where You Can Become the Hero and Save the World."
+              imageUrl="/images/poster-marvel.jpg" 
+            />
               <div className='text-right'>
                 <MidButton
                   onClick={() => setPage((prevPage) => Math.max(prevPage - 1, 1))}
@@ -173,7 +161,7 @@ const EngineGamesPage: React.FC = () => {
                   className="flex bg-gradient-to-r from-slate-600 via-slate-700 to-slate-500 p-4 shadow-lg shadow-cyan-400/50 hover:shadow-xl hover:shadow-cyan-400/70 focus:shadow-cyan-200/90"
                 >
                   <div className="flex-row basis-2/6">
-                  <Link to={`/game/${game.id}`} onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }}>
+                  <Link className='cursor-pointer' to={`/game/${game.id}`} onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }}>
                     <img
                       className="h-full max-h-96 object-cover shadow-lg shadow-cyan-400/50 hover:shadow-xl hover:shadow-cyan-400/70 focus:shadow-cyan-200/90"
                       src={`https://images.igdb.com/igdb/image/upload/t_cover_big/${game.cover?.image_id}.png`}
@@ -236,24 +224,8 @@ const EngineGamesPage: React.FC = () => {
                       : null }              
                     </p>
 
-                    {/* --- */}
-                    <p className='text-xs md:text-sm lg:text-sm text-slate-100'>
-                      {game.player_perspectives && game.player_perspectives.length > 0
-                      ? game.player_perspectives.map((player_perspective, index) => (
-                          <span key={player_perspective.id}>
-                            <LinkFontSize to={`/perspective/${player_perspective.slug}`} fontSize="text-xs md:text-sm lg:text-sm" fontType="Tektur">
-                              {player_perspective.name}
-                            </LinkFontSize>
-                            {index < game.player_perspectives.length - 1 ? ', ' : ''}
-                          </span>
-                        ))
-                      : null }              
-                    </p>
-
-
-
                     <div className="mt-2">
-                      <Link onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }}  to={`/game/${game.id}`}>
+                      <Link onClick={() => window.scrollTo(0, 0)} to={`/game/${game.id}`}>
                         <MiniButton gradientClass="gradient-1" size="text-sm" fullWidth={true}>
                           More
                         </MiniButton>
@@ -298,6 +270,8 @@ const EngineGamesPage: React.FC = () => {
                 </MidButton>
               </div>
             </div>
+
+
           </>
         )}
       </div>
@@ -305,4 +279,4 @@ const EngineGamesPage: React.FC = () => {
   );
 };
 
-export default EngineGamesPage;
+export default MarvelGamesPage;

@@ -3,6 +3,8 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import MiniButton from '../components/MiniButton';
 import LinkFontSize from '../components/LinkFontSize';
+import ProgressBar from '../components/ProgressBar';
+import SeoMetaTags from '../components/SeoMetaTags';
 
 
 interface Game {
@@ -14,6 +16,10 @@ interface Game {
   storyline: string;
   summary: string;
   game_engines: GameEngines[];
+  release_dates: ReleaseDates[];
+  total_rating: number;
+  total_rating_count: number;
+  rating: number;
 }
 
 interface Genre {
@@ -39,7 +45,13 @@ interface GameEngines {
   slug: string;
   url: string;
 }
-
+interface ReleaseDates {
+  id: number;
+  date: number;
+  human: string;
+  m: string;
+  y: string;
+}
 
 const News: React.FC = () => {
   const [games, setGames] = useState<Game[]>([]);
@@ -57,10 +69,10 @@ const News: React.FC = () => {
           }
           const gamesResponse = await axios.post(apiUrl, {
             endpoint: '/games',
-            fields: 'name,rating_count,storyline,summary,platforms.name,platforms.slug,platforms.abbreviation,platforms.alternative_name,cover.url,cover.image_id,genres.name,genres.slug,game_engines.name,game_engines.slug,game_engines.url',
+            fields: 'name,rating_count,storyline,summary,total_rating,total_rating_count,rating,platforms.name,platforms.slug,platforms.abbreviation,platforms.alternative_name,cover.url,cover.image_id,genres.name,genres.slug,game_engines.name,game_engines.slug,game_engines.url,release_dates.created_at,release_dates.date,release_dates.human,release_dates.m,release_dates.y',
             where: 'first_release_date < 1735685999 & first_release_date > 1672527599',
-            sort: 'total_rating_count desc',
-            limit: 12,
+            sort: 'rating desc',
+            limit: 24,
             offset: '',
           });
           setGames(gamesResponse.data);
@@ -89,7 +101,12 @@ const News: React.FC = () => {
         </div>
         ) : (
         <div className=''>
-        <h1 className='text-2xl md:text-4xl lg:text-4xl text-slate-200'>Games:</h1>
+        <SeoMetaTags 
+          title={`Gaming news | PCh`}
+          description="Everything about new in gaming world: exclusive insights, upcoming hits, and technological innovations."
+          imageUrl="/images/poster-news.jpg" 
+        />
+        <h1 className='text-2xl md:text-4xl lg:text-4xl text-slate-200'>News</h1>
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4'>
           {games.map(game => (
             <div key={game.id} className="flex bg-gradient-to-r from-slate-600 via-slate-700 to-slate-500 p-4 shadow-lg shadow-cyan-400/50 hover:shadow-xl hover:shadow-cyan-400/70 focus:shadow-cyan-200/90">
@@ -99,11 +116,9 @@ const News: React.FC = () => {
               </Link>
               </div>
               <div className='flex-row basis-4/6 p-2 text-slate-300'>
-
                 <div className='pb-4 '>
                   <LinkFontSize to={`/game/${game.id}`} fontSize="text-xl md:text-2xl lg:text-2xl">{game.name}</LinkFontSize>
                 </div>
-
 
                 <p className='text-xs md:text-sm lg:text-sm text-slate-100 line-clamp-3 text-ellipsis min-h-[3rem]'>{game.summary}</p>
 
@@ -152,7 +167,10 @@ const News: React.FC = () => {
                     ))
                   : null }              
                 </p>
+                <p className='text-xs md:text-sm lg:text-sm text-cyan-500'>{game.release_dates[0].y}.{game.release_dates[0].m}</p>
 
+
+                <ProgressBar currentProgress={game.rating} maxProgress={100} />
 
 
                 <p className='pt-4'>

@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretRight } from '@fortawesome/free-solid-svg-icons';
-import MiniButton from '../components/MiniButton';
-import Link from '../components/Link';
-import LinkButton from '../components/LinkButton';
+import { faCaretRight, faPhotoFilm, faGamepad } from '@fortawesome/free-solid-svg-icons';
+import { faYoutube, faApple, faAndroid, faSteamSquare } from '@fortawesome/free-brands-svg-icons';
+
+
 import LinkFontSize from '../components/LinkFontSize';
+import YouTubeVideo from '../components/VideoPlayer';
+import ProgressBar from '../components/ProgressBar';
+import LinkBlank from '../components/LinkBlank';
+import SeoMetaTags from '../components/SeoMetaTags';
 
 interface Game {
   id: number;
@@ -29,6 +34,11 @@ interface Game {
   keywords: KeyWords[];
   themes: Themes[];
   websites: Websites[];
+  total_rating_count: number;
+  total_rating: number;
+  rating: number;
+  release_dates: ReleaseDates[];
+  player_perspectives: PlayerPerspective[];
 }
 
 interface Genre {
@@ -72,8 +82,6 @@ interface Languages {
   name: string;
   native_name: string;
 }
-
-
 interface Videos {
   id: number;
   name: string;
@@ -107,10 +115,25 @@ interface Themes {
 }
 interface Websites {
   id: number;
+  checksum: number;
   category: number;
   trusted: boolean;
   url: string;
 }
+interface ReleaseDates {
+  id: number;
+  date: number;
+  human: string;
+  m: string;
+  y: string;
+}
+interface PlayerPerspective {
+  id: number;
+  name: string;
+  slug: string;
+  url: string;
+}
+
 
 const GameDetail: React.FC = () => {
   const { gameId } = useParams(); // gameId
@@ -128,14 +151,13 @@ const GameDetail: React.FC = () => {
         }
         
         const gameResponse = await axios.post(apiUrl, {
-          endpoint: '/games', // Ścieżka endpointu do IGDB API
-          fields: 'name,storyline,summary,slug,category,created_at,first_release_date,similar_games.name,similar_games.cover.image_id,platforms.name,platforms.slug,genres.name,genres.slug,language_supports.language.name,language_supports.language.native_name,cover.url,cover.image_id,game_engines.name,game_engines.slug,screenshots.image_id,screenshots.url,alternative_names.comment,alternative_names.name,keywords.name,keywords.slug,keywords.url,themes.name,themes.slug,themes.url,websites.category,websites.trusted,websites.url',
+          endpoint: '/games',
+          fields: 'name,storyline,summary,slug,category,created_at,first_release_date,total_rating,total_rating_count,rating,similar_games.name,similar_games.cover.image_id,platforms.name,platforms.slug,genres.name,genres.slug,language_supports.language.name,language_supports.language.native_name,cover.url,cover.image_id,game_engines.name,game_engines.slug,screenshots.image_id,screenshots.url,alternative_names.comment,alternative_names.name,keywords.name,keywords.slug,keywords.url,themes.name,themes.slug,themes.url,websites.category,websites.trusted,websites.url,websites.checksum,videos.name,videos.video_id,player_perspectives.name,player_perspectives.slug,player_perspectives.url',
           where: `id = ${gameId}`,
-          sort: 'name asc',
+          sort: 'name desc',
           limit: 1,
           offset: '',
         });
-
         if (gameResponse.data.length === 1) {
           setGame(gameResponse.data[0]);
         } else {
@@ -152,11 +174,23 @@ const GameDetail: React.FC = () => {
   }, [gameId]);
 
 
+  // useEffect(() => {
+  //   console.log(game);
+  // }, [game]);
+
 
   const convertUnixToDate = (unixTimestamp: number) => {
     const date = new Date(unixTimestamp * 1000);
     return date.toISOString().split('T')[0];
   };
+
+  const shortenSummary = (summary: string, maxLength: number = 160): string => {
+    if (summary.length <= maxLength) {
+      return summary;
+    }
+    return summary.substr(0, summary.lastIndexOf(' ', maxLength)) + '...';
+  };
+  
 
   return (
     <div className="container mx-auto p-4">
@@ -168,17 +202,31 @@ const GameDetail: React.FC = () => {
       ) : (
         game && (
           <div className='sm:flex bg-gradient-to-r from-slate-600 via-slate-700 to-slate-500 p-4 shadow-lg shadow-cyan-400/50 hover:shadow-xl hover:shadow-cyan-400/70 focus:shadow-cyan-200/90'>
-            <div className='flex-row basis-2/6 lg:basis-2/6'>
+        <SeoMetaTags 
+          title={`Game info | ${game.name} |  | PCh`} 
+          description={shortenSummary(game.summary, 160)} 
+          imageUrl= {`https://images.igdb.com/igdb/image/upload/t_cover_big/${game.cover?.image_id}.png`}
+        />
+            <div className='flex-row basis-2/6 lg:basis-2/6 p-2'>
               <img
-                key={game.id}
+                key={game.created_at}
                 className='w-full max-w-96 object-cover shadow-lg shadow-cyan-400/50 hover:shadow-xl hover:shadow-cyan-400/70 focus:shadow-cyan-200/90'
                 src={`https://images.igdb.com/igdb/image/upload/t_cover_big/${game.cover?.image_id}.png`}
                 alt={`cover-${game.name}`}
               />
+              <div className='py-4'>
+              {game.rating ? (
+                <ProgressBar currentProgress={game.rating} maxProgress={100} />
+              ) : (
+                null
+              )}
+              </div>
+
             </div>
-            <div className='flex-row basis-4/6 p-2 lg:basis-4/6'>
+            <div className='flex-row basis-4/6 lg:basis-4/6 p-2'>
               <h1 className='text-2xl md:text-2xl lg:text-2xl text-slate-100'>{game.name}</h1>
-              <p className='text-sm md:text-sm lg:text-sm text-slate-100 hover:text-cyan-400'>First release date: {convertUnixToDate(game.first_release_date)}</p>
+              <p className='text-sm md:text-sm lg:text-sm text-slate-100 hover:text-cyan-400'>First release date: {game.first_release_date ? convertUnixToDate(game.first_release_date) : "Data nieznana"}
+</p>
               <p className='text-sm md:text-sm lg:text-sm text-slate-100 hover:text-cyan-400'>Ceated at: {convertUnixToDate(game.created_at)}</p>
 
               {game.storyline ? (
@@ -199,15 +247,6 @@ const GameDetail: React.FC = () => {
                 null
               )}
 
-              {game.videos && game.videos.length > 0 ? (
-                game.videos.map(video => (
-                  <div key={video.id}>
-                    <p className='text-slate-200'>Video</p>
-                  </div>
-                ))
-              ) : (
-                null
-              )}
 
               <p className='text-xs md:text-sm lg:text-sm text-slate-100 hover:text-cyan-400'>
                 <span className='text-xs md:text-sm lg:text-sm text-cyan-400 hover:text-slate-100 font-bold'>Genres: </span>
@@ -224,7 +263,7 @@ const GameDetail: React.FC = () => {
               </p>
 
               <p className='text-xs md:text-sm lg:text-sm text-slate-100 hover:text-cyan-400'>
-                <span className='text-xs md:text-sm lg:text-sm text-cyan-400 hover:text-slate-100 font-bold'>Platforms: </span>
+                <span className='text-xs md:text-sm lg:text-sm text-cyan-400 hover:text-slate-100 font-bold'>Platforms:  </span>
                 {game.platforms && game.platforms.length > 0
                 ? game.platforms.map((platform, index) => (
                     <React.Fragment key={platform.id}>
@@ -251,8 +290,6 @@ const GameDetail: React.FC = () => {
                 : null }              
               </p>
 
-
-
               <p className='text-xs md:text-sm lg:text-sm text-slate-100'>
                 {game.language_supports && game.language_supports.length > 0 ? (
                   <>
@@ -272,58 +309,106 @@ const GameDetail: React.FC = () => {
               {game.alternative_names && game.alternative_names.length > 0 ? (
                 game.alternative_names.map(alternative_name => (
                   <div key={alternative_name.id}>
-                    <p className='text-xs md:text-sm lg:text-sm text-slate-100'><FontAwesomeIcon icon={faCaretRight} className="text-cyan-300" />&emsp;{alternative_name.comment}&emsp;{alternative_name.name}</p>
+                    <p className='text-xs md:text-sm lg:text-sm text-slate-100'><FontAwesomeIcon icon={faCaretRight} className="text-cyan-300" /> {alternative_name.comment}&emsp;{alternative_name.name}</p>
                   </div>
                 ))
               ) : (
                 null
               )}
 
-              <p className='text-xs md:text-sm lg:text-sm text-slate-100 pt-3'>
+              <p className='text-xs md:text-sm lg:text-sm text-slate-100 pt-3 line-clamp-3 text-ellipsis min-h-[3rem]'>
                 <span className='text-xs md:text-sm lg:text-sm text-slate-100 hover:text-cyan-400 font-bold'>Keywords: </span>
                 {game.keywords && game.keywords.length > 0
                 ? game.keywords.map((keyword, index) => (
                     <React.Fragment key={keyword.id}>
-                      <Link to={`/game/${game.id}`}>
+                      <LinkFontSize to={`/keyword/${game.keywords[index].slug}`} fontSize="text-xs md:text-sm lg:text-sm" fontType="Tektur">
                         {keyword.name}
-                      </Link>
+                      </LinkFontSize>
                       {index < game.keywords.length - 1 ? ', ' : ''}
                     </React.Fragment>
                   ))
-                : null }              
+                : false }
               </p>
 
-              <p className='text-xs md:text-sm lg:text-sm text-slate-100 hover:text-cyan-400'>
-                <span className='text-xs md:text-sm lg:text-sm text-slate-100 hover:text-cyan-400 font-bold'>Themes: </span>
-                {game.themes && game.themes.length > 0
-                ? game.themes.map((theme, index) => (
-                    <React.Fragment key={theme.id}>
-                      <Link to={`/game/${game.id}`}>
-                        {theme.name}
-                      </Link>
-                      {index < game.themes.length - 1 ? ', ' : ''}
-                    </React.Fragment>
+
+              {/* --- */}
+
+              {/* <p className='text-xs md:text-sm lg:text-sm text-slate-100 font-bold py-2'>
+                Websites:
+              </p>
+
+
+
+              {game.websites && game.websites.length > 0
+                ? game.websites.map((website, index) => (
+                    <div key={website.id}>
+                      {website.category === 13 ? (
+                        <p>
+                        <FontAwesomeIcon icon={faSteamSquare} className="text-sm md:text-lg lg:text-lg text-cyan-300 pr-4" />
+                        <LinkBlank to={website.url} fontSize="text-sm md:text-sm lg:text-sm" fontType="Tektur">Steam</LinkBlank>
+                        </p>
+                      ) : website.category === 12 ? (
+                        <p>
+                        <FontAwesomeIcon icon={faAndroid} className="text-sm md:text-lg lg:text-lg text-cyan-300 pr-4" />
+                        <LinkBlank to={website.url} fontSize="text-sm md:text-sm lg:text-sm" fontType="Tektur">Android</LinkBlank>
+                        </p>
+                      ) : website.category === 10 ? (
+                        <p>
+                        <FontAwesomeIcon icon={faApple} className="text-sm md:text-lg lg:text-lg text-cyan-300 pr-4" />
+                        <LinkBlank to={website.url} fontSize="text-sm md:text-sm lg:text-sm" fontType="Tektur">Apple App</LinkBlank>
+                        </p>
+                      ) : website.category === 16 ? (
+                        <p>
+                        <FontAwesomeIcon icon={faGamepad} className="text-sm md:text-lg lg:text-lg text-cyan-300 pr-4" />
+                        <LinkBlank to={website.url} fontSize="text-sm md:text-sm lg:text-sm" fontType="Tektur">Epic games </LinkBlank>
+                        </p>
+                      ) : (
+                        null
+                      )}
+                      
+                    </div>
                   ))
-                : null }              
-              </p>
+                : null }
 
-              <h3 className='text-lg md:text-xl lg:text-xl text-slate-100 hover:text-cyan-400 pt-3'>Screen shots:</h3>
-              {game.screenshots.map(screenshot => (
-                <img
-                key={screenshot.id}
-                loading='lazy'
-                className='w-full max-h-96 object-cover py-2 shadow-lg shadow-cyan-400/50 hover:shadow-xl hover:shadow-cyan-400/70 focus:shadow-cyan-200/90'
-                src={`https://images.igdb.com/igdb/image/upload/t_screenshot_big/${screenshot?.image_id
-                }.jpg`}
-                  alt={`screenshot-${screenshot.image_id}`}
-                />
-              ))}
+
+              {/* --- */}
+              {game.videos && game.videos.length > 0 ? (
+                game.videos.map(video => (
+                  <div key={video.id} className='pb-4'>
+                    <h3 className='text-lg md:text-lg lg:text-2xl text-cyan-100 pb-4 pt-2'>
+                    <FontAwesomeIcon icon={faYoutube} className="text-cyan-300" /> Video  - {video.name}</h3>
+                    <YouTubeVideo videoId={video.video_id} rel={1} color="white" />
+                  </div>
+                ))
+              ) : (
+                null
+              )}
+
+              <h3 className='text-lg md:text-xl lg:text-xl text-slate-100 hover:text-cyan-400 pt-3'>Screen shots</h3>
+
+              {game.screenshots && game.screenshots.length > 0 ? (
+                game.screenshots.map((screenshot, index) => (
+                  <React.Fragment key={screenshot.id}>
+                    <p className='text-sm md:text-lg lg:text-lg text-slate-100'><FontAwesomeIcon icon={faPhotoFilm} className="text-cyan-300" />  Screen #{index + 1}</p>
+                    <img
+                      key={screenshot.id}
+                      loading='lazy'
+                      className='w-full border-solid border-2 border-cyan-400 max-h-96 mb-4 object-cover shadow-lg shadow-cyan-400/50 hover:shadow-xl hover:shadow-cyan-400/70'
+                      src={`https://images.igdb.com/igdb/image/upload/t_screenshot_big/${screenshot?.image_id}.jpg`}
+                      alt={`screenshot-${screenshot.image_id}`}
+                    />
+                  </React.Fragment>
+                ))
+              ) : (
+                <p className='text-slate-100'>No screen shots.</p>
+              )}
+
 
               <h1 className='text-lg md:text-xl lg:text-2xl text-slate-100 pt-3'>Similar games:</h1>
               {game.similar_games && game.similar_games.length > 0 ? (
                 game.similar_games.map(similar_game => (
                   <div key={similar_game.id}>
-                    <FontAwesomeIcon icon={faCaretRight} className="text-sm md:text-lg lg:text-lg text-cyan-300" />&emsp;<LinkFontSize to={`/genre/${similar_game.id}`} fontSize="text-sm md:text-lg lg:text-lg" fontType="Tektur">{similar_game.name}</LinkFontSize>
+                    <FontAwesomeIcon icon={faCaretRight} className="text-sm md:text-lg lg:text-lg text-cyan-300" />&emsp;<LinkFontSize to={`/game/${similar_game.id}`} fontSize="text-sm md:text-lg lg:text-lg" fontType="Tektur">{similar_game.name}</LinkFontSize>
                   </div>
                 ))
               ) : (
@@ -333,11 +418,7 @@ const GameDetail: React.FC = () => {
               {/* {JSON.stringify(game.alternative_names)} */}
 
 
-              <p className='pt-4'>
-                <LinkButton to='/'>
-                  <MiniButton gradientClass='gradient-2' size='text-sm' fullWidth={true}>Home Page</MiniButton>
-                </LinkButton>
-              </p>
+
             </div>
           </div>
         )

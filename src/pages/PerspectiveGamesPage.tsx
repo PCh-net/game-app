@@ -1,4 +1,4 @@
-// src/pages/EngineGamesPage.tsx
+// src/pages/GenreGamesPage.tsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams, Link, useNavigate } from 'react-router-dom';
@@ -6,6 +6,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import MiniButton from '../components/MiniButton';
 import MidButton from '../components/MidButton';
 import LinkFontSize from '../components/LinkFontSize';
+import ProgressBar from '../components/ProgressBar';
 import SeoMetaTags from '../components/SeoMetaTags';
 
 interface Game {
@@ -17,6 +18,10 @@ interface Game {
   storyline: string;
   summary: string;
   game_engines: GameEngines[];
+  release_dates: ReleaseDates[];
+  total_rating_count: number;
+  total_rating: number;
+  rating: number;
   player_perspectives: PlayerPerspective[];
 }
 
@@ -46,6 +51,14 @@ interface GameEngines {
   slug: string;
   url: string;
 }
+
+interface ReleaseDates {
+  id: number;
+  date: number;
+  human: string;
+  m: string;
+  y: string;
+}
 interface PlayerPerspective {
   id: number;
   name: string;
@@ -53,23 +66,30 @@ interface PlayerPerspective {
   url: string;
 }
 
-const EngineGamesPage: React.FC = () => {
+
+
+const PerspectiveGamesPage: React.FC = () => {
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const { gameEngineSlug } = useParams<{ gameEngineSlug: string }>();
+  const { perspectiveSlug } = useParams<{ perspectiveSlug: string }>();
   const navigate = useNavigate();
 
   const [page, setPage] = useState(1);
   const [pageSize] = useState(12);
-  const safePlatformSlug = gameEngineSlug ?? 'unknown-genre';
+  const safePerspectiveSlug = perspectiveSlug ?? 'unknown';
+
+
+
 
   useEffect(() => {
 
-    if (!gameEngineSlug) {
+    if (!perspectiveSlug) {
       // ... 404
       navigate('/404');
 
+      console.log({perspectiveSlug});
+      console.log('ok'); 
 
     } else {
       // ... logic
@@ -77,6 +97,7 @@ const EngineGamesPage: React.FC = () => {
         setLoading(true);
         setIsLoading(true);
 
+        
         try {
           let apiUrl: string;
           if (process.env.NODE_ENV === 'production') {
@@ -87,9 +108,9 @@ const EngineGamesPage: React.FC = () => {
 
           const gamesResponse = await axios.post(apiUrl, {
             endpoint: '/games',
-            fields: 'name,rating_count,storyline,summary,platforms.slug,platforms.name,cover.url,cover.image_id,genres.name,genres.slug,game_engines.name,game_engines.slug',
-            where: `game_engines.slug = "${gameEngineSlug}" & release_dates.date >= 1517439599`,
-            sort: 'name desc',
+            fields: 'name,rating_count,storyline,summary,total_rating,total_rating_count,rating,platforms.slug,platforms.name,cover.url,cover.image_id,genres.name,genres.slug,game_engines.name,game_engines.slug,release_dates.created_at,release_dates.date,release_dates.human,release_dates.m,release_dates.y,player_perspectives.name,player_perspectives.slug,player_perspectives.url',
+            where: `player_perspectives.slug = "${perspectiveSlug}" & release_dates.date >= 1672527599`,
+            sort: 'rating desc',
             limit: pageSize,
             offset: (page - 1) * pageSize,
           });
@@ -103,35 +124,35 @@ const EngineGamesPage: React.FC = () => {
       };
       fetchGames();
     }
-  }, [gameEngineSlug, navigate, page, pageSize]);
+  }, [perspectiveSlug, navigate, page, pageSize]);
 
 
-  // useEffect(() => {
-  //   console.log(games);
-  // }, [games]);
+  useEffect(() => {
+    console.log(games);
+  }, [games]);
 
 
   return (
     <div className="container mx-auto p-4">
+      <SeoMetaTags 
+        title={`Games perspectives | ${safePerspectiveSlug.replace(/-/g, ' ')} | PCh`}
+        description="Discover Games from Various Perspectives: Feel the Adrenaline in First-Person, Strategy and Tactics in Top-Down View, and Full Immersion in 3D Worlds."
+        imageUrl="/images/poster-perspectives.jpg" 
+      />
       <h1 className="text-2xl md:text-4xl lg:text-4xl text-slate-200 py-3">
-      Games engine {safePlatformSlug.toUpperCase().replace(/-/g, ' ')}
+      Games perspectives {safePerspectiveSlug.toUpperCase().replace(/-/g, ' ')}
       </h1>
       {/* ... */}
       <div className="">
         {loading ? (
           <div className="loader-container">
-            <h1 className="text-2xl text-slate-200">Loading...</h1>
+            <h1 className="text-2xl text-slate-200">Loading page {page}</h1>
             <img className="w-40" src="/images/loader.gif" alt="loader"></img>
           </div>
         ) : (
           <>
             {isLoading && <img className="w-20" src="/images/loader.gif" alt="Loading..." />}
             <div className="flex items-center justify-center space-x-4 pb-4">
-              <SeoMetaTags 
-                title={`Engine games | ${safePlatformSlug.replace(/-/g, ' ')} | PCh`}
-                description="Discover the Capabilities of Modern Game Engines: Innovations, Performance, and Developer Support."
-                imageUrl="/images/poster-engines.jpg" 
-              />
               <div className='text-right'>
                 <MidButton
                   onClick={() => setPage((prevPage) => Math.max(prevPage - 1, 1))}
@@ -173,7 +194,7 @@ const EngineGamesPage: React.FC = () => {
                   className="flex bg-gradient-to-r from-slate-600 via-slate-700 to-slate-500 p-4 shadow-lg shadow-cyan-400/50 hover:shadow-xl hover:shadow-cyan-400/70 focus:shadow-cyan-200/90"
                 >
                   <div className="flex-row basis-2/6">
-                  <Link to={`/game/${game.id}`} onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }}>
+                  <Link className='cursor-pointer' to={`/game/${game.id}`} onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }}>
                     <img
                       className="h-full max-h-96 object-cover shadow-lg shadow-cyan-400/50 hover:shadow-xl hover:shadow-cyan-400/70 focus:shadow-cyan-200/90"
                       src={`https://images.igdb.com/igdb/image/upload/t_cover_big/${game.cover?.image_id}.png`}
@@ -233,11 +254,12 @@ const EngineGamesPage: React.FC = () => {
                             {index < game.game_engines.length - 1 ? ', ' : ''}
                           </span>
                         ))
-                      : null }              
+                      : null }
                     </p>
 
                     {/* --- */}
                     <p className='text-xs md:text-sm lg:text-sm text-slate-100'>
+                      <span className='text-xs md:text-sm lg:text-sm text-cyan-400 font-bold'>Player perspective: </span>
                       {game.player_perspectives && game.player_perspectives.length > 0
                       ? game.player_perspectives.map((player_perspective, index) => (
                           <span key={player_perspective.id}>
@@ -250,10 +272,21 @@ const EngineGamesPage: React.FC = () => {
                       : null }              
                     </p>
 
+                    <p className='text-xs md:text-sm lg:text-sm text-slate-100 hover:text-cyan-400'>{game.release_dates[0].y}.{game.release_dates[0].m}</p>
+
+                    <p className='text-xs md:text-sm lg:text-sm text-slate-100 hover:text-cyan-400'>
+                      <span className='text-xs md:text-sm lg:text-sm text-cyan-400 hover:text-slate-100 font-bold'>Rating: </span>
+                    </p>
+
+                    {game.rating ? (
+                      <ProgressBar currentProgress={game.rating} maxProgress={100} />
+                    ) : (
+                      null
+                    )}
 
 
                     <div className="mt-2">
-                      <Link onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }}  to={`/game/${game.id}`}>
+                      <Link onClick={() => window.scrollTo(0, 0)} to={`/game/${game.id}`}>
                         <MiniButton gradientClass="gradient-1" size="text-sm" fullWidth={true}>
                           More
                         </MiniButton>
@@ -298,6 +331,8 @@ const EngineGamesPage: React.FC = () => {
                 </MidButton>
               </div>
             </div>
+
+
           </>
         )}
       </div>
@@ -305,4 +340,4 @@ const EngineGamesPage: React.FC = () => {
   );
 };
 
-export default EngineGamesPage;
+export default PerspectiveGamesPage;

@@ -2,11 +2,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 
 import MiniButton from '../components/MiniButton';
 import MidButton from '../components/MidButton';
 import LinkFontSize from '../components/LinkFontSize';
+import ProgressBar from '../components/ProgressBar';
+import SeoMetaTags from '../components/SeoMetaTags';
+
 
 interface Game {
   id: number;
@@ -17,6 +19,11 @@ interface Game {
   storyline: string;
   summary: string;
   game_engines: GameEngines[];
+  release_dates: ReleaseDates[];
+  total_rating_count: number;
+  total_rating: number;
+  rating: number;
+  player_perspectives: PlayerPerspective[];
 }
 
 interface Genre {
@@ -46,6 +53,22 @@ interface GameEngines {
   url: string;
 }
 
+interface ReleaseDates {
+  id: number;
+  date: number;
+  human: string;
+  m: string;
+  y: string;
+}
+interface PlayerPerspective {
+  id: number;
+  name: string;
+  slug: string;
+  url: string;
+}
+
+
+
 const GenreGamesPage: React.FC = () => {
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,7 +78,10 @@ const GenreGamesPage: React.FC = () => {
 
   const [page, setPage] = useState(1);
   const [pageSize] = useState(12);
-  const safePlatformSlug = genreSlug ?? 'unknown-genre';
+  const safeGenreSlug = genreSlug ?? 'unknown-genre';
+
+
+
 
   useEffect(() => {
 
@@ -71,8 +97,8 @@ const GenreGamesPage: React.FC = () => {
       const fetchGames = async () => {
         setLoading(true);
         setIsLoading(true);
-        console.log("Aktualna strona:", page);
-        console.log("Ilość elementów na stronie:", pageSize);
+
+        
         try {
           let apiUrl: string;
           if (process.env.NODE_ENV === 'production') {
@@ -80,14 +106,12 @@ const GenreGamesPage: React.FC = () => {
           } else {
             apiUrl = 'http://localhost:3001/getData';
           }
-    // console.log({genreSlug});
-    // console.log('ok');
 
           const gamesResponse = await axios.post(apiUrl, {
             endpoint: '/games',
-            fields: 'name,rating_count,storyline,summary,platforms.slug,platforms.name,cover.url,cover.image_id,genres.name,genres.slug,game_engines.name,game_engines.slug',
-            where: `genres.slug = "${genreSlug}"`,
-            sort: 'total_rating_count desc',
+            fields: 'name,rating_count,storyline,summary,total_rating,total_rating_count,rating,platforms.slug,platforms.name,cover.url,cover.image_id,genres.name,genres.slug,game_engines.name,game_engines.slug,release_dates.created_at,release_dates.date,release_dates.human,release_dates.m,release_dates.y,player_perspectives.name,player_perspectives.slug,player_perspectives.url',
+            where: `genres.slug = "${genreSlug}" & release_dates.date >= 1672527599`,
+            sort: 'rating desc',
             limit: pageSize,
             offset: (page - 1) * pageSize,
           });
@@ -104,15 +128,20 @@ const GenreGamesPage: React.FC = () => {
   }, [genreSlug, navigate, page, pageSize]);
 
 
-  // useEffect(() => {
-  //   console.log(games);
-  // }, [games]);
+  useEffect(() => {
+    console.log(games);
+  }, [games]);
 
 
   return (
     <div className="container mx-auto p-4">
+      <SeoMetaTags 
+        title={`Genre games | ${safeGenreSlug.replace(/-/g, ' ')} | PCh`}
+        description="Discover the Latest RPGs: Experience Unforgettable Adventures and Unparalleled Storylines"
+        imageUrl="/images/poster-genres.jpg" 
+      />
       <h1 className="text-2xl md:text-4xl lg:text-4xl text-slate-200 py-3">
-      Games genres {safePlatformSlug.toUpperCase().replace('-', ' ')}
+      Games genres {safeGenreSlug.toUpperCase().replace(/-/g, ' ')}
       </h1>
       {/* ... */}
       <div className="">
@@ -226,8 +255,33 @@ const GenreGamesPage: React.FC = () => {
                             {index < game.game_engines.length - 1 ? ', ' : ''}
                           </span>
                         ))
+                      : null }
+                    </p>
+
+                    {/* --- */}
+                    <p className='text-xs md:text-sm lg:text-sm text-slate-100'>
+                      <span className='text-xs md:text-sm lg:text-sm text-cyan-400 font-bold'>Player perspective: </span>
+                      {game.player_perspectives && game.player_perspectives.length > 0
+                      ? game.player_perspectives.map((player_perspective, index) => (
+                          <span key={player_perspective.id}>
+                            <LinkFontSize to={`/perspective/${player_perspective.slug}`} fontSize="text-xs md:text-sm lg:text-sm" fontType="Tektur">
+                              {player_perspective.name}
+                            </LinkFontSize>
+                            {index < game.player_perspectives.length - 1 ? ', ' : ''}
+                          </span>
+                        ))
                       : null }              
                     </p>
+
+
+                    <p className='text-xs md:text-sm lg:text-sm text-slate-100 hover:text-cyan-400'>{game.release_dates[0].y}.{game.release_dates[0].m}</p>
+
+                    {game.rating ? (
+                      <ProgressBar currentProgress={game.rating} maxProgress={100} />
+                    ) : (
+                      null
+                    )}
+
 
                     <div className="mt-2">
                       <Link onClick={() => window.scrollTo(0, 0)} to={`/game/${game.id}`}>
@@ -276,170 +330,7 @@ const GenreGamesPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 pt-4">
-              {/* --- */}
-              <div className="flex flex-col bg-gradient-to-r from-slate-600 via-slate-700 to-slate-500 p-4 shadow-lg shadow-cyan-400/50 hover:shadow-xl hover:shadow-cyan-400/70 focus:shadow-cyan-200/90">
-                <Link to="/platform/meta-quest-3" onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }}>
-                  <motion.div
-                    whileHover={{ scale: 1.05, boxShadow: '0px 10px 20px rgba(55, 175, 230, 0.7)' }}
-                  >
-                    <img
-                      className='w-full h-auto max-w-128 object-cover'
-                      src="/images/platform/meta-quest-3.png"
-                      alt="meta-quest-3"
-                    />
-                  </motion.div>
-                </Link>
-                <Link className='pt-4' onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }} to="/platform/meta-quest-3">
-                  <MiniButton gradientClass="gradient-1" size="text-sm" fullWidth={true}>
-                    Games
-                  </MiniButton>
-                </Link>
-              </div>
 
-              {/* --- */}
-              <div className="flex flex-col bg-gradient-to-r from-slate-600 via-slate-700 to-slate-500 p-4 shadow-lg shadow-cyan-400/50 hover:shadow-xl hover:shadow-cyan-400/70 focus:shadow-cyan-200/90">
-                <Link to="/platform/android" onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }}>
-                  <motion.div
-                    whileHover={{ scale: 1.05, boxShadow: '0px 10px 20px rgba(55, 175, 230, 0.7)' }}
-                  >
-                    <img
-                      className='w-full h-auto max-w-128 object-cover'
-                      src="/images/platform/android-13.png"
-                      alt="android-13"
-                    />
-                  </motion.div>
-                </Link>
-                <Link className='pt-4' onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }} to="/platform/android">
-                  <MiniButton gradientClass="gradient-1" size="text-sm" fullWidth={true}>
-                    Games
-                  </MiniButton>
-                </Link>
-              </div>
-
-              {/* --- */}
-              <div className="flex flex-col bg-gradient-to-r from-slate-600 via-slate-700 to-slate-500 p-4 shadow-lg shadow-cyan-400/50 hover:shadow-xl hover:shadow-cyan-400/70 focus:shadow-cyan-200/90">
-                <Link to="/platform/win" onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }}>
-                  <motion.div
-                    whileHover={{ scale: 1.05, boxShadow: '0px 10px 20px rgba(55, 175, 230, 0.7)' }}
-                  >
-                    <img
-                      className='w-full h-auto max-w-128 object-cover'
-                      src="/images/platform/windows-11.png"
-                      alt="windows-11"
-                    />
-                  </motion.div>
-                </Link>
-                <Link className='pt-4' onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }} to="/platform/win">
-                  <MiniButton gradientClass="gradient-1" size="text-sm" fullWidth={true}>
-                    Games
-                  </MiniButton>
-                </Link>
-              </div>
-
-              {/* --- */}
-              <div className="flex flex-col bg-gradient-to-r from-slate-600 via-slate-700 to-slate-500 p-4 shadow-lg shadow-cyan-400/50 hover:shadow-xl hover:shadow-cyan-400/70 focus:shadow-cyan-200/90">
-                <Link to="/platform/switch" onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }}>
-                  <motion.div
-                    whileHover={{ scale: 1.05, boxShadow: '0px 10px 20px rgba(55, 175, 230, 0.7)' }}
-                  >
-                    <img
-                      className='w-full h-auto max-w-128 object-cover'
-                      src="/images/platform/nintendo-switch.png"
-                      alt="nintendo-switch"
-                    />
-                  </motion.div>
-                </Link>
-                <Link className='pt-4' onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }} to="/platform/switch">
-                  <MiniButton gradientClass="gradient-1" size="text-sm" fullWidth={true}>
-                    Games
-                  </MiniButton>
-                </Link>
-              </div>
-
-              {/* --- */}
-              <div className="flex flex-col bg-gradient-to-r from-slate-600 via-slate-700 to-slate-500 p-4 shadow-lg shadow-cyan-400/50 hover:shadow-xl hover:shadow-cyan-400/70 focus:shadow-cyan-200/90">
-                <Link to="/platform/oculus-go" onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }}>
-                  <motion.div
-                    whileHover={{ scale: 1.05, boxShadow: '0px 10px 20px rgba(55, 175, 230, 0.7)' }}
-                  >
-                    <img
-                      className='w-full h-auto max-w-128 object-cover'
-                      src="/images/platform/oculus-go.png"
-                      alt="oculus-go"
-                    />
-                  </motion.div>
-                </Link>
-                <Link className='pt-4' onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }} to="/platform/oculus-go">
-                  <MiniButton gradientClass="gradient-1" size="text-sm" fullWidth={true}>
-                    Games
-                  </MiniButton>
-                </Link>
-              </div>
-
-              {/* --- */}
-              <div className="flex flex-col bg-gradient-to-r from-slate-600 via-slate-700 to-slate-500 p-4 shadow-lg shadow-cyan-400/50 hover:shadow-xl hover:shadow-cyan-400/70 focus:shadow-cyan-200/90">
-                <Link to="/platform/mac" onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }}>
-                  <motion.div
-                    whileHover={{ scale: 1.05, boxShadow: '0px 10px 20px rgba(55, 175, 230, 0.7)' }}
-                  >
-                    <img
-                      className='w-full h-auto max-w-128 object-cover'
-                      src="/images/platform/mac.png"
-                      alt="mac"
-                    />
-                  </motion.div>
-                </Link>
-                <Link className='pt-4' onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }} to="/platform/mac">
-                  <MiniButton gradientClass="gradient-1" size="text-sm" fullWidth={true}>
-                    Games
-                  </MiniButton>
-                </Link>
-              </div>
-
-              {/* --- */}
-              <div className="flex flex-col bg-gradient-to-r from-slate-600 via-slate-700 to-slate-500 p-4 shadow-lg shadow-cyan-400/50 hover:shadow-xl hover:shadow-cyan-400/70 focus:shadow-cyan-200/90">
-                <Link to="/platform/ios" onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }}>
-                  <motion.div
-                    whileHover={{ scale: 1.05, boxShadow: '0px 10px 20px rgba(55, 175, 230, 0.7)' }}
-                  >
-                    <img
-                      className='w-full h-auto max-w-128 object-cover'
-                      src="/images/platform/ios.png"
-                      alt="ios"
-                    />
-                  </motion.div>
-                </Link>
-                <Link className='pt-4' onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }} to="/platform/ios">
-                  <MiniButton gradientClass="gradient-1" size="text-sm" fullWidth={true}>
-                    Games
-                  </MiniButton>
-                </Link>
-              </div>
-
-              {/* --- */}
-              <div className="flex flex-col bg-gradient-to-r from-slate-600 via-slate-700 to-slate-500 p-4 shadow-lg shadow-cyan-400/50 hover:shadow-xl hover:shadow-cyan-400/70 focus:shadow-cyan-200/90">
-                <Link to="/platform/linux" onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }}>
-                  <motion.div
-                    whileHover={{ scale: 1.05, boxShadow: '0px 10px 20px rgba(55, 175, 230, 0.7)' }}
-                  >
-                    <img
-                      className='w-full h-auto max-w-128 object-cover'
-                      src="/images/platform/linux.png"
-                      alt="linux"
-                    />
-                  </motion.div>
-                </Link>
-                <Link className='pt-4' onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }} to="/platform/linux">
-                  <MiniButton gradientClass="gradient-1" size="text-sm" fullWidth={true}>
-                    Games
-                  </MiniButton>
-                </Link>
-              </div>
-
-
-
-            </div>
           </>
         )}
       </div>

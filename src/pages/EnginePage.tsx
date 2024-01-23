@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faTimes, faCaretRight } from '@fortawesome/free-solid-svg-icons';
-import MiniButton from '../components/MiniButton';
 import { motion } from 'framer-motion';
+
+import MiniButton from '../components/MiniButton';
+import SeoMetaTags from '../components/SeoMetaTags';
 
 const EnginePage = () => {
 
 
   return (
   <div className="container mx-auto p-4">
+  <SeoMetaTags 
+    title={`Engine games | PCh`}
+    description="Discover the Capabilities of Modern Game Engines: Innovations, Performance, and Developer Support."
+    imageUrl="/images/poster-engines.jpg" 
+  />
     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4 pt-4">
     {/* --- */}
     <div className="flex flex-col bg-gradient-to-r from-slate-600 via-slate-700 to-slate-500 p-4 shadow-lg shadow-cyan-400/50 hover:shadow-xl hover:shadow-cyan-400/70 focus:shadow-cyan-200/90">

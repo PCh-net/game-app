@@ -26,6 +26,7 @@ const NavBar = () => {
               <Link to="/news" className='pl-4' ><MiniButton fullWidth={true} >News</MiniButton></Link>
               <Link to="/platform" className='pl-4' ><MiniButton fullWidth={true} >Platform</MiniButton></Link>
               <Link to="/engine" className='pl-4' ><MiniButton fullWidth={true} >Engine</MiniButton></Link>
+              <Link to="/theme" className='pl-4' ><MiniButton fullWidth={true} >Theme</MiniButton></Link>
             </div>
           </div>
           {/* mobile menu button */}
@@ -51,14 +52,25 @@ const NavBar = () => {
         </p>
         <p className='text-xl text-slate-100 hover:text-cyan-300'>
           <Link to="/platform" onClick={() => window.scrollTo(0, 0)} className="block py-2 px-4 hover:bg-slate-500 hover:shadow-lg hover:shadow-cyan-400/50 focus:shadow-xl focus:shadow-cyan-400/80 focus:text-cyan-300">
-            <FontAwesomeIcon icon={faCaretRight} className='text-xl' />&emsp;Platform
+            <FontAwesomeIcon icon={faCaretRight} className='text-xl' />&emsp;Platforms
           </Link>
         </p>
         <p className='text-xl text-slate-100 hover:text-cyan-300'>
           <Link to="/engine" onClick={() => window.scrollTo(0, 0)} className="block py-2 px-4 hover:bg-slate-500 hover:shadow-lg hover:shadow-cyan-400/50 focus:shadow-xl focus:shadow-cyan-400/80 focus:text-cyan-300">
-            <FontAwesomeIcon icon={faCaretRight} className='text-xl' />&emsp;Engine
+            <FontAwesomeIcon icon={faCaretRight} className='text-xl' />&emsp;Engines
           </Link>
         </p>
+        <p className='text-xl text-slate-100 hover:text-cyan-300'>
+          <Link to="/theme" onClick={() => window.scrollTo(0, 0)} className="block py-2 px-4 hover:bg-slate-500 hover:shadow-lg hover:shadow-cyan-400/50 focus:shadow-xl focus:shadow-cyan-400/80 focus:text-cyan-300">
+            <FontAwesomeIcon icon={faCaretRight} className='text-xl' />&emsp;Themes
+          </Link>
+        </p>
+        <p className='text-xl text-slate-100 hover:text-cyan-300'>
+          <Link to="/marvel" onClick={() => window.scrollTo(0, 0)} className="block py-2 px-4 hover:bg-slate-500 hover:shadow-lg hover:shadow-cyan-400/50 focus:shadow-xl focus:shadow-cyan-400/80 focus:text-cyan-300">
+            <FontAwesomeIcon icon={faCaretRight} className='text-xl' />&emsp;Marvel
+          </Link>
+        </p>
+
 
       </div>
     </nav>
